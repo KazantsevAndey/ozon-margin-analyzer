@@ -13,6 +13,7 @@ with st.sidebar:
     api_key = st.text_input("API ключ Ozon", type="password")
     perf_key = st.text_input("API ключ Performance API", type="password")
     client_id = st.text_input("Client ID (Seller ID)", type="default")
+    perf_client_id = st.text_input("Performance Client ID")
     st.markdown("Ключи сохраняются только в сессии и не передаются третьим лицам.")
 
 # Выбор способа ввода прайса
@@ -40,7 +41,7 @@ if st.button("📊 Рассчитать (этап 2)"):
     else:
         with st.spinner("Выполняется расчёт..."):
             try:
-                results = calculate_all(api_key, perf_key, price, client_id)
+                results = calculate_all(api_key, perf_key, perf_client_id, price, client_id)
                 st.success("Расчёт выполнен успешно!")
 
                 for name, table in results.items():
