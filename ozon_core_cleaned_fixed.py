@@ -1,4 +1,4 @@
-def calculate_all(api_key, perf_key, price_df, client_id):
+def calculate_all(api_key, perf_key, price, client_id):
     # -*- coding: utf-8 -*-
     """Ozon Margin Analyzer.ipynb"
     
