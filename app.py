@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from ozon_core_cleaned_fixed import calculate_all
+import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Ozon Margin Analyzer", layout="wide")
 st.title("🧾 Ozon Margin Analyzer")
