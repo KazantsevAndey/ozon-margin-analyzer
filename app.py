@@ -21,14 +21,17 @@ upload_method = st.radio("Выберите способ:", ["Загрузить 
 
 price_df = None
 
-if upload_method == "Загрузить CSV":
-    uploaded_file = st.file_uploader("Загрузите .csv файл с прайс-листом", type="csv")
+if upload_method == "Загрузить Excel":
+    uploaded_file = st.file_uploader("Загрузите .xlsx файл с прайс-листом", type="xlsx")
     if uploaded_file is not None:
-        price_df = pd.read_csv(uploaded_file)
-        st.success("Файл загружен.")
-        st.dataframe(price_df)
+        try:
+            price_df = pd.read_excel(uploaded_file)
+            st.success("Файл успешно загружен.")
+            st.dataframe(price_df)
+        except Exception as e:
+            st.error(f"Ошибка при чтении Excel-файла: {e}")
 else:
-    st.info("⚠️ Ручной ввод пока не реализован. Используйте CSV.")
+    st.info("⚠️ Ручной ввод пока не реализован. Используйте Excel.")
 
 # Кнопка запуска
 if st.button("📊 Рассчитать (этап 2)"):
