@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 from ozon_core_cleaned_fixed import calculate_all
-
 st.set_page_config(page_title="Ozon Margin Analyzer", layout="wide")
 st.title("🧾 Ozon Margin Analyzer")
 st.subheader("🚀 Загрузите прайс-лист и введите ключи")
