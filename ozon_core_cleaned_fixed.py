@@ -960,6 +960,64 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     plt.tight_layout()
     plt.show()
 
+    # Фрагмент для вставки в calculate_all — блок графиков
+
+# График 1: Сумма отгрузки по категориям (за вчера)
+    df1 = grouped_by_type_yesterday.sort_values(by='Сумма отгрузки', ascending=True)
+    fig1, ax1 = plt.subplots(figsize=(10, 6))
+    bars = ax1.barh(df1['Тип'], df1['Сумма отгрузки'], color='cornflowerblue')
+    for bar in bars:
+        width = bar.get_width()
+        ax1.text(width + 1000, bar.get_y() + bar.get_height()/2, f'{width:,.0f}', va='center')
+    ax1.set_xlabel('Сумма отгрузки (₽)')
+    ax1.set_title('Сумма отгрузки по категориям (за вчера)')
+    ax1.grid(axis='x', linestyle='--', alpha=0.5)
+    plt.tight_layout()
+
+# График 2: Сравнение суммы отгрузки и прибыли (за вчера)
+    df2 = df1.copy()
+    df2['Прибыль'] = df2['Сумма отгрузки'] - df2['Сумма себестоимости'] - df2['ДРР']
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
+    ax2.barh(df2['Тип'], df2['Сумма отгрузки'], color='cornflowerblue', label='Сумма отгрузки')
+    ax2.barh(df2['Тип'], df2['Прибыль'], color='red', label='Прибыль')
+    for i, (y, profit) in enumerate(zip(df2['Тип'], df2['Прибыль'])):
+        ax2.text(profit + 1000, i, f'{profit:,.0f}', va='center', fontsize=8)
+    ax2.set_xlabel('₽')
+    ax2.set_title('Сравнение отгрузки и прибыли по категориям (за вчера)')
+    ax2.grid(axis='x', linestyle='--', alpha=0.5)
+    ax2.legend()
+    plt.tight_layout()
+
+# График 3: Столбики рядом — отгрузка и прибыль
+    x = np.arange(len(df2['Тип']))
+    width = 0.35
+    fig3, ax3 = plt.subplots(figsize=(10, 6))
+    bars1 = ax3.bar(x - width/2, df2['Сумма отгрузки'], width, label='Сумма отгрузки', color='#4C72B0')
+    bars2 = ax3.bar(x + width/2, df2['Прибыль'], width, label='Прибыль', color='#DD8452')
+    ax3.set_ylabel('₽')
+    ax3.set_title('Отгрузка и прибыль по категориям (за вчера)')
+    ax3.set_xticks(x)
+    ax3.set_xticklabels(df2['Тип'], rotation=45)
+    ax3.legend()
+    ax3.grid(axis='y', linestyle='--', alpha=0.3)
+    plt.tight_layout()
+
+# График 4: Топ-15 товаров по отгрузке
+    df_sku = final_result_yesterday.sort_values(by='Сумма отгрузки', ascending=False).head(15)
+    fig4, ax4 = plt.subplots(figsize=(15, 6))
+    bars = ax4.bar(df_sku['name'], df_sku['Сумма отгрузки'], color='skyblue')
+    for bar in bars:
+        ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 2000,
+             f'{bar.get_height():,.0f} ₽', ha='center', va='bottom', fontsize=8)
+    ax4.set_ylabel('₽')
+    ax4.set_title('Топ-15 товаров по сумме отгрузки (за вчера)')
+    ax4.set_xticklabels(df_sku['name'], rotation=75, ha='right')
+    ax4.grid(axis='y', linestyle='--', alpha=0.3)
+    plt.tight_layout()
+
+# Добавляем графики в results
+
+
     
     return {
     "💰 Начисления за вчера": nachislen_yesterday,
@@ -978,4 +1036,9 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     },
     "📦 Финальная таблица за вчера": final_result_yesterday,
     "📦 Финальная таблица за месяц": final_result_month
+
+    "📈 График: Отгрузка по категориям (вчера)": fig1,
+    "📈 График: Сравнение отгрузки и прибыли": fig2,
+    "📈 График: Отгрузка vs Прибыль (столбики)": fig3,
+    "📈 График: Топ-15 SKU по отгрузке": fig4
 }
