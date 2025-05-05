@@ -1,4 +1,5 @@
 def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
+    return {"Заглушка": price.head(3)}
     import matplotlib.pyplot as plt
     import numpy as np
     import pandas as pd
