@@ -1,4 +1,4 @@
-def calculate_all(api_key, perf_key, price, client_id):
+def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     # -*- coding: utf-8 -*-
     """Ozon Margin Analyzer.ipynb"
     
@@ -13,6 +13,15 @@ def calculate_all(api_key, perf_key, price, client_id):
     import pandas as pd
     from datetime import datetime, timedelta
     import requests
+
+    performance_data = fetch_performance_reports(perf_client_id, perf_key)
+
+    if "error" in performance_data:
+        print("❌ Ошибка Performance API:", performance_data["details"])
+    else:
+        report_yesterday = performance_data["yesterday"]
+        report_month = performance_data["month"]
+        print("✅ Performance отчёты получены")
     
     def fetch_performance_reports(client_id, client_secret):
     import requests
@@ -611,8 +620,8 @@ def calculate_all(api_key, perf_key, price, client_id):
         "Accept": "application/json"
     }
     payload = {
-        "client_id": "Ваш айди клиент на озон перфоманс",
-        "client_secret": "Ваш апи ключ на озон перфоманс",
+        "client_id": perf_client_id,
+        "client_secret": perf_key,
         "grant_type": "client_credentials"
     }
     
