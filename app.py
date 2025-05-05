@@ -1,46 +1,48 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
+from ozon_core import calculate_all
 
 st.set_page_config(page_title="Ozon Margin Analyzer", layout="wide")
-st.title("🛒 Ozon Margin Analyzer")
 
-# --- SIDEBAR: API Ключи ---
+st.title("🧾 Ozon Margin Analyzer")
+st.subheader("🚀 Загрузите прайс-лист и введите ключи")
+
+# Ввод ключей
 with st.sidebar:
-    st.header("🔐 API-ключи Ozon")
-    ozon_api_key = st.text_input("API ключ Ozon", type="password")
-    ozon_perf_key = st.text_input("API ключ Performance API", type="password")
-    st.markdown("---")
-    st.caption("Эти ключи пока не используются — подключим их на 2 этапе.")
+    st.markdown("🔐 **API-ключи Ozon**")
+    api_key = st.text_input("API ключ Ozon", type="password")
+    perf_key = st.text_input("API ключ Performance API", type="password")
+    client_id = st.text_input("Client ID (Seller ID)", type="default")
+    st.markdown("Ключи сохраняются только в сессии и не передаются третьим лицам.")
 
-# --- Ввод данных ---
-st.subheader("📦 Загрузите прайс-лист или введите вручную")
+# Выбор способа ввода прайса
+st.markdown("### 📦 Загрузите прайс-лист или заполните вручную")
 upload_method = st.radio("Выберите способ:", ["Загрузить CSV", "Заполнить вручную"])
 
-df = None
+price_df = None
 
 if upload_method == "Загрузить CSV":
-    uploaded_file = st.file_uploader("Загрузите .csv файл с прайс-листом", type=["csv"])
-    if uploaded_file:
-        try:
-            df = pd.read_csv(uploaded_file)
-            st.success("Файл успешно загружен.")
-        except Exception as e:
-            st.error(f"Ошибка при чтении файла: {e}")
+    uploaded_file = st.file_uploader("Загрузите .csv файл с прайс-листом", type="csv")
+    if uploaded_file is not None:
+        price_df = pd.read_csv(uploaded_file)
+        st.success("Файл загружен.")
+        st.dataframe(price_df)
 else:
-    df = st.data_editor(
-        pd.DataFrame({
-            "Артикул": [],
-            "Себестоимость": [],
-            "Желаемая цена": []
-        }),
-        num_rows="dynamic",
-        use_container_width=True
-    )
+    st.info("⚠️ Ручной ввод пока не реализован. Используйте CSV.")
 
-# --- Кнопка запуска (будущая логика) ---
-if st.button("📊 Рассчитать (этап 2)") and df is not None and not df.empty:
-    st.info("Здесь появятся таблицы с расчётами. Этап 2 — подключение к API.")
-    st.dataframe(df, use_container_width=True)
-else:
-    st.caption("После загрузки прайса нажмите кнопку для расчёта.")
+# Кнопка запуска
+if st.button("📊 Рассчитать (этап 2)"):
+    if not api_key or not perf_key or not client_id or price_df is None:
+        st.error("Пожалуйста, заполните все поля и загрузите прайс.")
+    else:
+        with st.spinner("Выполняется расчёт..."):
+            try:
+                results = calculate_all(api_key, perf_key, price_df, client_id)
+                st.success("Расчёт выполнен успешно!")
+
+                for name, table in results.items():
+                    st.subheader(f"📋 {name}")
+                    st.dataframe(table, use_container_width=True)
+
+            except Exception as e:
+                st.error(f"Произошла ошибка: {e}")
