@@ -972,6 +972,7 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     ax1.set_xlabel('Сумма отгрузки (₽)')
     ax1.set_title('Сумма отгрузки по категориям (за вчера)')
     ax1.grid(axis='x', linestyle='--', alpha=0.5)
+    plt.subplots_adjust(left=0.3, bottom=0.2)
     plt.tight_layout()
 
 # График 2: Сравнение суммы отгрузки и прибыли (за вчера)
