@@ -972,6 +972,22 @@ def calculate_all(api_key, perf_key, price_df, client_id):
     plt.tight_layout()
     plt.show()
 
+    
     return {
-        "Заглушка": price_df.head(5)  # Заменить на реальные таблицы
-    }
+    "💰 Начисления за вчера": nachislen_yesterday,
+    "💰 Начисления с начала месяца": nachislen_month,
+    "📊 Итоги (вчера)": {
+        "Себестоимость": total_sebestoimost_yesterday,
+        "Отгрузка": total_otgruzka_yesterday,
+        "Доля себестоимости": sebestoimost_ratio_yesterday,
+        "Маржа": marzha_percentage_yesterday
+    },
+    "📊 Итоги (месяц)": {
+        "Себестоимость": total_sebestoimost_month,
+        "Отгрузка": total_otgruzka_month,
+        "Доля себестоимости": sebestoimost_ratio_month,
+        "Маржа": marzha_percentage_month
+    },
+    "📦 Финальная таблица за вчера": final_result_yesterday,
+    "📦 Финальная таблица за месяц": final_result_month
+}
