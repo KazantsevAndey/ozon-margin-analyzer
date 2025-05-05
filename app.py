@@ -19,15 +19,15 @@ with st.sidebar:
 st.markdown("### 📦 Загрузите прайс-лист или заполните вручную")
 upload_method = st.radio("Выберите способ:", ["Загрузить Excel", "Заполнить вручную"])
 
-price_df = None
+price = None
 
 if upload_method == "Загрузить Excel":
     uploaded_file = st.file_uploader("Загрузите .xlsx файл с прайс-листом", type="xlsx")
     if uploaded_file is not None:
         try:
-            price_df = pd.read_excel(uploaded_file)
+            price = pd.read_excel(uploaded_file)
             st.success("Файл успешно загружен.")
-            st.dataframe(price_df)
+            st.dataframe(price)
         except Exception as e:
             st.error(f"Ошибка при чтении Excel-файла: {e}")
 else:
@@ -35,12 +35,12 @@ else:
 
 # Кнопка запуска
 if st.button("📊 Рассчитать (этап 2)"):
-    if not api_key or not perf_key or not client_id or price_df is None:
+    if not api_key or not perf_key or not client_id or price is None:
         st.error("Пожалуйста, заполните все поля и загрузите прайс.")
     else:
         with st.spinner("Выполняется расчёт..."):
             try:
-                results = calculate_all(api_key, perf_key, price_df, client_id)
+                results = calculate_all(api_key, perf_key, price, client_id)
                 st.success("Расчёт выполнен успешно!")
 
                 for name, table in results.items():
