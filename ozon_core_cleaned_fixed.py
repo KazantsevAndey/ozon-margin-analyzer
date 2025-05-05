@@ -1,66 +1,10 @@
 def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
-    return {"Заглушка": price.head(3)}
     import matplotlib.pyplot as plt
     import numpy as np
     import pandas as pd
     from datetime import datetime, timedelta
     import requests
 
-    performance_data = fetch_performance_reports(perf_client_id, perf_key)
-
-    if "error" in performance_data:
-        print("❌ Ошибка Performance API:", performance_data["details"])
-    else:
-        report_yesterday = performance_data["yesterday"]
-        report_month = performance_data["month"]
-        print("✅ Performance отчёты получены")
-        
-    def fetch_performance_reports(client_id, client_secret):
-    import requests
-    from datetime import datetime, timedelta
-
-    url_token = "https://api-performance.ozon.ru/api/client/token"
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    }
-    payload = {
-        "client_id": client_id,
-        "client_secret": client_secret,
-        "grant_type": "client_credentials"
-    }
-
-    response = requests.post(url_token, headers=headers, json=payload)
-    if response.status_code != 200:
-        return {"error": f"Auth error {response.status_code}", "details": response.text}
-
-    access_token = response.json()["access_token"]
-
-    yesterday = datetime.now() - timedelta(days=1)
-    date_from_yesterday = yesterday.strftime("%Y-%m-%dT00:00:00Z")
-    date_to_yesterday = yesterday.strftime("%Y-%m-%dT23:59:59Z")
-
-    start_of_month = datetime.now().replace(day=1)
-    date_from_month = start_of_month.strftime("%Y-%m-%dT00:00:00Z")
-    date_to_today = yesterday.strftime("%Y-%m-%dT23:59:59Z")
-
-    report_url = "https://api-performance.ozon.ru/api/client/statistics/campaign/product/json"
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-    }
-
-    def fetch_report(start_date, end_date):
-        r = requests.get(report_url, headers=headers, params={"from": start_date, "to": end_date})
-        return r.json() if r.status_code == 200 else None
-
-    return {
-        "yesterday": fetch_report(date_from_yesterday, date_to_yesterday),
-        "month": fetch_report(date_from_month, date_to_today)
-    }
-    
-    
     
     
     """Загрузили прайс с себестоимостью или взяли его с гугл диска."""
