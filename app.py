@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from ozon_core_cleaned_fixed import calculate_all
 import matplotlib.pyplot as plt
+import openai
 
 st.set_page_config(page_title="Ozon Margin Analyzer", layout="wide")
 st.title("🧾 Ozon Margin Analyzer")
@@ -54,3 +55,40 @@ if st.button("📊 Рассчитать (этап 2)"):
 
             except Exception as e:
                 st.error(f"Произошла ошибка: {e}")
+
+
+openai.api_key = "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"
+
+if st.button("🧠 Проанализировать отчёты с помощью GPT"):
+    with st.spinner("Анализируем отчёты..."):
+        try:
+            # Собираем все таблицы
+            full_report = ""
+            for name, table in results.items():
+                if isinstance(table, pd.DataFrame):
+                    full_report += f"\n\n{name}:\n{table.head(20).to_string(index=False)}"
+                elif isinstance(table, dict):
+                    for k, v in table.items():
+                        full_report += f"\n\n{name} – {k}: {v}"
+                else:
+                    full_report += f"\n\n{name}: {table}"
+
+            prompt = (
+                "Ты аналитик данных. Проанализируй следующий набор отчетов по продажам. "
+                "Сделай выводы, укажи на важные закономерности, провалы, резкие изменения или успехи. "
+                "Дай 3–5 чётких рекомендаций по улучшению маржи и продаж:\n"
+                + full_report
+            )
+
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=1000
+            )
+
+            st.subheader("📋 GPT-анализ отчётов")
+            st.write(response.choices[0].message["content"])
+
+        except Exception as e:
+            st.error(f"Произошла ошибка при анализе: {e}")
