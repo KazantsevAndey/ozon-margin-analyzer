@@ -79,7 +79,7 @@ if st.button("🧠 Проанализировать отчёты с помощь
                 + full_report
             )
 
-            client = OpenAI(api_key="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")  # 🔒 Вставь сюда свой API-ключ
+            client = OpenAI(api_key="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")  # 🔒 Вставь сюда свой API-ключ
 
             response = client.chat.completions.create(
                 model="gpt-4",
