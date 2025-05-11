@@ -3,6 +3,7 @@ import pandas as pd
 from ozon_core_cleaned_fixed import calculate_all
 import matplotlib.pyplot as plt
 import openai
+from openai import OpenAI
 
 openai.api_key = "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"
 
@@ -79,14 +80,16 @@ if st.button("🧠 Проанализировать отчёты с помощь
                 + full_report
             )
 
-            response = openai.ChatCompletion.create(
+            client = OpenAI(api_key=openai.api_key)
+            response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
                 max_tokens=1000
             )
-
             st.subheader("📋 GPT-анализ отчётов")
-            st.write(response.choices[0].message["content"])
+            st.write(response.choices[0].message.content)
+
+            
         except Exception as e:
             st.error(f"Произошла ошибка при анализе: {e}")
