@@ -45,6 +45,7 @@ if st.button("📊 Рассчитать (этап 2)"):
         with st.spinner("Выполняется расчёт..."):
             try:
                 results = calculate_all(api_key, perf_key, perf_client_id, price, client_id)
+                st.session_state.results = results
                 st.success("Расчёт выполнен успешно!")
 
                 # Отдельно рендерим таблицы
@@ -58,37 +59,34 @@ if st.button("📊 Рассчитать (этап 2)"):
             except Exception as e:
                 st.error(f"Произошла ошибка: {e}")
 
+if st.button("🧠 Проанализировать отчёты с помощью GPT"):
+    with st.spinner("Анализируем отчёты..."):
+        try:
+            full_report = ""
+            for name, table in st.session_state.results.items():
+                if isinstance(table, pd.DataFrame):
+                    full_report += f"\n\n{name}:\n{table.head(20).to_string(index=False)}"
+                elif isinstance(table, dict):
+                    for k, v in table.items():
+                        full_report += f"\n\n{name} – {k}: {v}"
+                else:
+                    full_report += f"\n\n{name}: {table}"
 
-                if st.button("🧠 Проанализировать отчёты с помощью GPT"):
-                    with st.spinner("Анализируем отчёты..."):
-                        try:
-            # Собираем все таблицы
-                            full_report = ""
-                            for name, table in results.items():
-                                if isinstance(table, pd.DataFrame):
-                                    full_report += f"\n\n{name}:\n{table.head(20).to_string(index=False)}"
-                                elif isinstance(table, dict):
-                                    for k, v in table.items():
-                                        full_report += f"\n\n{name} – {k}: {v}"
-                                else:
-                                    full_report += f"\n\n{name}: {table}"
+            prompt = (
+                "Ты аналитик данных. Проанализируй следующий набор отчётов по продажам. "
+                "Сделай выводы, укажи на важные закономерности, провалы, резкие изменения или успехи. "
+                "Дай 3–5 чётких рекомендаций по улучшению маржи и продаж:\n"
+                + full_report
+            )
 
-                            prompt = (
-                                "Ты аналитик данных. Проанализируй следующий набор отчетов по продажам. "
-                                "Сделай выводы, укажи на важные закономерности, провалы, резкие изменения или успехи. "
-                                "Дай 3–5 чётких рекомендаций по улучшению маржи и продаж:\n"
-                                + full_report
-                            )
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=1000
+            )
 
-                            response = openai.ChatCompletion.create(
-                                model="gpt-4",
-                                messages=[{"role": "user", "content": prompt}],
-                                temperature=0.3,
-                                max_tokens=1000
-                            )
-
-                            st.subheader("📋 GPT-анализ отчётов")
-                            st.write(response.choices[0].message["content"])
-
-                        except Exception as e:
-                            st.error(f"Произошла ошибка при анализе: {e}")
+            st.subheader("📋 GPT-анализ отчётов")
+            st.write(response.choices[0].message["content"])
+        except Exception as e:
+            st.error(f"Произошла ошибка при анализе: {e}")
