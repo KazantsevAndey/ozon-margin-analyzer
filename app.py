@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import openai
 from openai import OpenAI
 
-openai.api_key = "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"
 
 st.set_page_config(page_title="Ozon Margin Analyzer", layout="wide")
 st.title("🧾 Ozon Margin Analyzer")
@@ -80,16 +79,17 @@ if st.button("🧠 Проанализировать отчёты с помощь
                 + full_report
             )
 
-            client = OpenAI(api_key=openai.api_key)
+            client = OpenAI(api_key="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")  # 🔒 Вставь сюда свой API-ключ
+
             response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.3,
                 max_tokens=1000
             )
+
             st.subheader("📋 GPT-анализ отчётов")
             st.write(response.choices[0].message.content)
 
-            
         except Exception as e:
             st.error(f"Произошла ошибка при анализе: {e}")
