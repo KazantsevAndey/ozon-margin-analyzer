@@ -4,6 +4,7 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     import pandas as pd
     from datetime import datetime, timedelta
     import requests
+    import io
 
     
     
@@ -1018,6 +1019,28 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
 
 # Добавляем графики в results
 
+    buffer_account = io.BytesIO()
+    buffer_sku = io.BytesIO()
+
+    with pd.ExcelWriter(buffer_account, engine="xlsxwriter") as writer:
+        nachislen_yesterday.to_excel(writer, sheet_name="Начисления вчера", index=False)
+        nachislen_month.to_excel(writer, sheet_name="Начисления месяц", index=False)
+        pd.DataFrame([{
+            "Себестоимость": total_sebestoimost_yesterday,
+            "Отгрузка": total_otgruzka_yesterday,
+            "Доля себестоимости": sebestoimost_ratio_yesterday,
+            "Маржа": marzha_percentage_yesterday
+        }]).to_excel(writer, sheet_name="Итоги вчера", index=False)
+        pd.DataFrame([{
+            "Себестоимость": total_sebestoimost_month,
+            "Отгрузка": total_otgruzka_month,
+            "Доля себестоимости": sebestoimost_ratio_month,
+            "Маржа": marzha_percentage_month
+        }]).to_excel(writer, sheet_name="Итоги месяц", index=False)
+
+    with pd.ExcelWriter(buffer_sku, engine="xlsxwriter") as writer:
+        final_result_yesterday.to_excel(writer, sheet_name="SKU вчера", index=False)
+        final_result_month.to_excel(writer, sheet_name="SKU месяц", index=False)
 
     
     return {
@@ -1041,5 +1064,7 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     "📈 График: Отгрузка по категориям (вчера)": fig1,
     "📈 График: Сравнение отгрузки и прибыли": fig2,
     "📈 График: Отгрузка vs Прибыль (столбики)": fig3,
-    "📈 График: Топ-15 SKU по отгрузке": fig4
+    "📈 График: Топ-15 SKU по отгрузке": fig4,
+    "🧾 Буфер отчёта по аккаунту": buffer_account,
+    "🧾 Буфер отчёта по SKU": buffer_sku
 }
