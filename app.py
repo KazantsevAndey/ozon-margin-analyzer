@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from openai import OpenAI
 import streamlit as st
 import openai
+import io
 
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
@@ -61,19 +62,19 @@ if st.button("📊 Рассчитать (этап 2)"):
             except Exception as e:
                 st.error(f"Произошла ошибка: {e}")
 
-import io
-buffer_account = io.BytesIO()
-buffer_sku = io.BytesIO()
 
-with pd.ExcelWriter(buffer_account, engine="xlsxwriter") as writer:
-    results["💰 Начисления за вчера"].to_excel(writer, sheet_name="Начисления вчера", index=False)
-    results["💰 Начисления с начала месяца"].to_excel(writer, sheet_name="Начисления месяц", index=False)
-    pd.DataFrame([results["📊 Итоги (вчера)"]]).to_excel(writer, sheet_name="Итоги вчера", index=False)
-    pd.DataFrame([results["📊 Итоги (месяц)"]]).to_excel(writer, sheet_name="Итоги месяц", index=False)
+    buffer_account = io.BytesIO()
+    buffer_sku = io.BytesIO()
 
-with pd.ExcelWriter(buffer_sku, engine="xlsxwriter") as writer:
-    results["📦 Финальная таблица за вчера"].to_excel(writer, sheet_name="SKU вчера", index=False)
-    results["📦 Финальная таблица за месяц"].to_excel(writer, sheet_name="SKU месяц", index=False)
+    with pd.ExcelWriter(buffer_account, engine="xlsxwriter") as writer:
+        results["💰 Начисления за вчера"].to_excel(writer, sheet_name="Начисления вчера", index=False)
+        results["💰 Начисления с начала месяца"].to_excel(writer, sheet_name="Начисления месяц", index=False)
+        pd.DataFrame([results["📊 Итоги (вчера)"]]).to_excel(writer, sheet_name="Итоги вчера", index=False)
+        pd.DataFrame([results["📊 Итоги (месяц)"]]).to_excel(writer, sheet_name="Итоги месяц", index=False)
+
+    with pd.ExcelWriter(buffer_sku, engine="xlsxwriter") as writer:
+        results["📦 Финальная таблица за вчера"].to_excel(writer, sheet_name="SKU вчера", index=False)
+        results["📦 Финальная таблица за месяц"].to_excel(writer, sheet_name="SKU месяц", index=False)
 
 # --- Кнопки скачивания ---
 st.download_button("⬇️ Скачать отчёт по аккаунту", data=buffer_account.getvalue(), file_name="account_summary.xlsx")
