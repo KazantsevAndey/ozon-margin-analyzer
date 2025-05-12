@@ -11,7 +11,7 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.set_page_config(page_title="Ozon Margin Analyzer", layout="wide")
 st.title("🧾 Ozon Margin Analyzer")
-results = st.session_state.get("results")
+#results = st.session_state.get("results")
 st.subheader("🚀 Загрузите прайс-лист и введите ключи")
 
 # Ввод ключей
@@ -77,41 +77,43 @@ if st.button("📊 Рассчитать (этап 2)"):
 # GPT-анализ SKU
 # GPT-анализ отчёта по аккаунту
 
-if st.button("🤖 GPT-анализ отчётов"):
-    with st.spinner("GPT анализирует отчёты..."):
+if st.button("🧠 GPT-анализ отчётов"):
+    with st.spinner("Анализируем отчёты..."):
         try:
-            # Читаем Excel из буфера
-            df_account = pd.read_excel(results["buffer_account"], sheet_name=None)
-            df_sku = pd.read_excel(results["buffer_sku"], sheet_name=None)
+            # Читаем Excel-файлы из буфера
+            df_account = pd.read_excel(results["buffer_account"])
+            df_sku = pd.read_excel(results["buffer_sku"])
 
-            # Превращаем первые 10 строк каждого листа в текст
-            account_text = ""
-            for sheet, df in df_account.items():
-                account_text += f"\n--- {sheet} ---\n{df.head(10).to_string(index=False)}\n"
+            # Формируем текст из первых строк таблиц
+            report_text = f"""📊 **Анализ отчёта по аккаунту**:
 
-            sku_text = ""
-            for sheet, df in df_sku.items():
-                sku_text += f"\n--- {sheet} ---\n{df.head(10).to_string(index=False)}\n"
+{df_account.head(15).to_string(index=False)}
 
-            # Отправляем в GPT
+📦 **Анализ отчёта по SKU**:
+
+{df_sku.head(15).to_string(index=False)}
+"""
+
+            # Формируем prompt
             prompt = (
-                "Ты аналитик. Проанализируй отчёт по аккаунту и по SKU. "
-                "Укажи ключевые расходы, тренды и дай рекомендации по марже.\n\n"
-                f"📊 Отчёт по аккаунту:\n{account_text}\n"
-                f"📦 Отчёт по SKU:\n{sku_text}"
+                "Ты аналитик маркетплейса. Проанализируй следующие отчёты о продажах. "
+                "Дай выводы по марже, затратам и проблемным SKU.\n\n"
+                + report_text
             )
 
-            response = openai.chat.completions.create(
+            client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+            response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.4,
+                temperature=0.3,
+                max_tokens=1000
             )
 
-            st.subheader("📈 Рекомендации GPT")
+            st.subheader("📋 GPT-анализ отчётов")
             st.write(response.choices[0].message.content)
 
         except Exception as e:
-            st.error(f"Ошибка анализа: {e}")
+            st.error(f"Произошла ошибка при анализе: {e}")
 #if st.button("🧠 Анализ показателей с помощью ИИ"):
 #    with st.spinner("Анализируем отчёты..."):
 #        try:
