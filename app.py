@@ -54,7 +54,7 @@ if st.button("📊 Рассчитать (этап 2)"):
                 st.markdown("### ⬇️ Скачайте готовые Excel-отчёты")
                 st.download_button("📥 Отчёт по аккаунту", data=results["buffer_account"].getvalue(), file_name="account_summary.xlsx")
                 st.download_button("📥 Отчёт по SKU (юнит-экономика)", data=results["buffer_sku"].getvalue(), file_name="sku_unit_economics.xlsx")
-                st.session_state.results = results
+                #st.session_state.results = results
 
                 # Отдельно рендерим таблицы
                 for name, value in results.items():
