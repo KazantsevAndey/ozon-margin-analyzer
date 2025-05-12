@@ -78,42 +78,35 @@ if st.button("📊 Рассчитать (этап 2)"):
 # GPT-анализ отчёта по аккаунту
 
 if st.button("🧠 GPT-анализ отчётов"):
-    with st.spinner("Анализируем отчёты..."):
-        try:
-            # Читаем Excel-файлы из буфера
-            df_account = pd.read_excel(results["buffer_account"])
-            df_sku = pd.read_excel(results["buffer_sku"])
+    if "results" not in st.session_state:
+        st.error("Сначала рассчитай отчёты.")
+    else:
+        with st.spinner("Анализируем отчёты..."):
+            try:
+                results = st.session_state.results
+                df_account = pd.read_excel(results["buffer_account"])
+                df_sku = pd.read_excel(results["buffer_sku"])
 
-            # Формируем текст из первых строк таблиц
-            report_text = f"""📊 **Анализ отчёта по аккаунту**:
+                prompt = (
+                    "Ты аналитик маркетплейса. Проанализируй следующие Excel-отчёты. "
+                    "Выведи ключевые выводы по марже, затратам и товарам с проблемной экономикой.\n\n"
+                    f"Отчёт по аккаунту (первые 20 строк):\n{df_account.head(20).to_string(index=False)}\n\n"
+                    f"Отчёт по SKU (первые 20 строк):\n{df_sku.head(20).to_string(index=False)}"
+                )
 
-{df_account.head(15).to_string(index=False)}
+                client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+                response = client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.3,
+                    max_tokens=1000
+                )
 
-📦 **Анализ отчёта по SKU**:
+                st.subheader("📋 GPT-анализ отчётов")
+                st.write(response.choices[0].message.content)
 
-{df_sku.head(15).to_string(index=False)}
-"""
-
-            # Формируем prompt
-            prompt = (
-                "Ты аналитик маркетплейса. Проанализируй следующие отчёты о продажах. "
-                "Дай выводы по марже, затратам и проблемным SKU.\n\n"
-                + report_text
-            )
-
-            client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-            response = client.chat.completions.create(
-                model="gpt-4",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.3,
-                max_tokens=1000
-            )
-
-            st.subheader("📋 GPT-анализ отчётов")
-            st.write(response.choices[0].message.content)
-
-        except Exception as e:
-            st.error(f"Произошла ошибка при анализе: {e}")
+            except Exception as e:
+                st.error(f"Ошибка при анализе: {e}")
 #if st.button("🧠 Анализ показателей с помощью ИИ"):
 #    with st.spinner("Анализируем отчёты..."):
 #        try:
