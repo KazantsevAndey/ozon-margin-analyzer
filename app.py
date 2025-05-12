@@ -53,6 +53,9 @@ if st.button("📊 Рассчитать (этап 2)"):
                 st.markdown("### ⬇️ Скачайте готовые Excel-отчёты")
                 st.download_button("📥 Отчёт по аккаунту", data=results["buffer_account"].getvalue(), file_name="account_summary.xlsx")
                 st.download_button("📥 Отчёт по SKU (юнит-экономика)", data=results["buffer_sku"].getvalue(), file_name="sku_unit_economics.xlsx")
+                st.markdown("### ⬇️ Скачайте готовые Excel-отчёты")
+                st.download_button("📥 Отчёт по аккаунту", data=results["📄 Буфер отчёта по аккаунту"].getvalue(), file_name="account_summary.xlsx")
+                st.download_button("📥 Отчёт по SKU (юнит-экономика)", data=results["📄 Буфер отчёта по SKU"].getvalue(), file_name="sku_unit_economics.xlsx")
 
                 # Отдельно рендерим таблицы
                 for name, value in results.items():
@@ -96,30 +99,8 @@ if st.button("🧠 Анализировать отчёт по аккаунту")
 
 # GPT-анализ SKU
 # GPT-анализ отчёта по аккаунту
-if st.button("🧠 Анализировать отчёт по аккаунту"):
-    with st.spinner("Анализируем отчёт по аккаунту..."):
-        try:
-            prompt_account = (
-                "Ты аналитик. Проанализируй отчёт по аккаунту. Укажи ключевые статьи затрат, тренд по марже, "
-                "и дай краткие рекомендации:\n\n"
-                f"📊 Итоги вчера: {results['📊 Итоги (вчера)']}\n"
-                f"📊 Итоги месяц: {results['📊 Итоги (месяц)']}\n\n"
-                f"💰 Начисления вчера:\n{results['💰 Начисления за вчера'].head(10).to_string(index=False)}\n\n"
-                f"💰 Начисления месяц:\n{results['💰 Начисления с начала месяца'].head(10).to_string(index=False)}"
-            )
 
-            response = openai.chat.completions.create(
-                model="gpt-4",
-                messages=[{"role": "user", "content": prompt_account}],
-                temperature=0.3,
-                max_tokens=1000
-            )
-
-            st.subheader("📋 Анализ аккаунта")
-            st.write(response.choices[0].message.content)
-
-        except Exception as e:
-            st.error(f"Ошибка: {e}")
+       
 #if st.button("🧠 Анализ показателей с помощью ИИ"):
 #    with st.spinner("Анализируем отчёты..."):
 #        try:
