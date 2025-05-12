@@ -82,8 +82,8 @@ if st.button("🧠 Анализировать отчёт по аккаунту")
                 "и дай краткие рекомендации:\n"
                 f"Итоги вчера: {results['📊 Итоги (вчера)']}\n"
                 f"Итоги месяц: {results['📊 Итоги (месяц)']}\n"
-                f"Начисления вчера:\n{nachislen_yesterday.head(10).to_string(index=False)}\n"
-                f"Начисления месяц:\n{nachislen_month.head(10).to_string(index=False)}"
+                f"Начисления вчера:\n{nachislen_yesterday.head(100).to_string(index=False)}\n"
+                f"Начисления месяц:\n{nachislen_month.head(100).to_string(index=False)}"
             )
             response = openai.chat.completions.create(
                 model="gpt-4",
