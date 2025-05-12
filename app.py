@@ -63,22 +63,10 @@ if st.button("📊 Рассчитать (этап 2)"):
                 st.error(f"Произошла ошибка: {e}")
 
 
-    buffer_account = io.BytesIO()
-    buffer_sku = io.BytesIO()
-
-    with pd.ExcelWriter(buffer_account, engine="xlsxwriter") as writer:
-        results["💰 Начисления за вчера"].to_excel(writer, sheet_name="Начисления вчера", index=False)
-        results["💰 Начисления с начала месяца"].to_excel(writer, sheet_name="Начисления месяц", index=False)
-        pd.DataFrame([results["📊 Итоги (вчера)"]]).to_excel(writer, sheet_name="Итоги вчера", index=False)
-        pd.DataFrame([results["📊 Итоги (месяц)"]]).to_excel(writer, sheet_name="Итоги месяц", index=False)
-
-    with pd.ExcelWriter(buffer_sku, engine="xlsxwriter") as writer:
-        results["📦 Финальная таблица за вчера"].to_excel(writer, sheet_name="SKU вчера", index=False)
-        results["📦 Финальная таблица за месяц"].to_excel(writer, sheet_name="SKU месяц", index=False)
-
-# --- Кнопки скачивания ---
-st.download_button("⬇️ Скачать отчёт по аккаунту", data=buffer_account.getvalue(), file_name="account_summary.xlsx")
-st.download_button("⬇️ Скачать отчёт по юнит-экономике", data=buffer_sku.getvalue(), file_name="sku_unit_economics.xlsx")
+    # Кнопки скачивания Excel-отчётов
+st.markdown("### ⬇️ Скачайте готовые Excel-отчёты")
+st.download_button("📥 Отчёт по аккаунту", data=results["🧾 Буфер отчёта по аккаунту"].getvalue(), file_name="account_summary.xlsx")
+st.download_button("📥 Отчёт по SKU (юнит-экономика)", data=results["🧾 Буфер отчёта по SKU"].getvalue(), file_name="sku_unit_economics.xlsx")
 # GPT-анализ отчёта по аккаунту
 if st.button("🧠 Анализировать отчёт по аккаунту"):
     with st.spinner("Анализируем отчёт по аккаунту..."):
