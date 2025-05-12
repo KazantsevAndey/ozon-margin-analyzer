@@ -11,6 +11,7 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.set_page_config(page_title="Ozon Margin Analyzer", layout="wide")
 st.title("🧾 Ozon Margin Analyzer")
+results = st.session_state.get("results")
 st.subheader("🚀 Загрузите прайс-лист и введите ключи")
 
 # Ввод ключей
