@@ -75,33 +75,49 @@ if st.button("📊 Рассчитать (этап 2)"):
 #st.download_button("📥 Отчёт по аккаунту", data=results["buffer_account"].getvalue(), file_name="account_summary.xlsx")
 #st.download_button("📥 Отчёт по SKU (юнит-экономика)", data=results["buffer_sku"].getvalue(), file_name="sku_unit_economics.xlsx")
 # GPT-анализ отчёта по аккаунту
-if st.button("🧠 Анализировать отчёт по аккаунту"):
-    with st.spinner("Анализируем отчёт по аккаунту..."):
-        try:
-            prompt_account = (
-                "Ты аналитик. Проанализируй отчёт по аккаунту. Укажи ключевые статьи затрат, тренд по марже, "
-                "и дай краткие рекомендации:\n"
-                f"Итоги вчера: {results['📊 Итоги (вчера)']}\n"
-                f"Итоги месяц: {results['📊 Итоги (месяц)']}\n"
-                f"Начисления вчера:\n{nachislen_yesterday.head(100).to_string(index=False)}\n"
-                f"Начисления месяц:\n{nachislen_month.head(100).to_string(index=False)}"
-            )
-            response = openai.chat.completions.create(
-                model="gpt-4",
-                messages=[{"role": "user", "content": prompt_account}],
-                temperature=0.3,
-                max_tokens=1000
-            )
-            st.subheader("📋 Анализ аккаунта")
-            st.write(response.choices[0].message.content)
-
-        except Exception as e:
-            st.error(f"Ошибка: {e}")
 
 # GPT-анализ SKU
 # GPT-анализ отчёта по аккаунту
 
-       
+if st.button("🧠 GPT-анализ отчётов"):
+    with st.spinner("GPT анализирует отчёты..."):
+        try:
+            # Чтение Excel-отчётов из буферов
+            df_account = pd.read_excel(results["📄 Буфер отчёта по аккаунту"], sheet_name=None)
+            df_sku = pd.read_excel(results["📄 Буфер отчёта по SKU"], sheet_name=None)
+
+            # Собираем данные из всех листов (например, первые 10 строк каждого)
+            account_text = ""
+            for sheet, df in df_account.items():
+                account_text += f"\n--- {sheet} ---\n" + df.head(10).to_string(index=False)
+
+            sku_text = ""
+            for sheet, df in df_sku.items():
+                sku_text += f"\n--- {sheet} ---\n" + df.head(10).to_string(index=False)
+
+            # Формируем промт
+            prompt = (
+                "Ты финансовый аналитик. Проанализируй отчёты по продажам: "
+                "1. Укажи ключевые статьи затрат и сравни маржу. "
+                "2. Найди товары с низкой маржой или высокой ДРР. "
+                "3. Сформулируй 3–5 рекомендаций по улучшению экономики.\n\n"
+                "📊 Отчёт по аккаунту:\n" + account_text +
+                "\n\n📦 Отчёт по SKU:\n" + sku_text
+            )
+
+            # Запрос в GPT
+            response = openai.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=1000
+            )
+
+            st.subheader("📋 GPT-анализ отчётов")
+            st.write(response.choices[0].message.content)
+
+        except Exception as e:
+            st.error(f"Произошла ошибка при анализе: {e}")       
 #if st.button("🧠 Анализ показателей с помощью ИИ"):
 #    with st.spinner("Анализируем отчёты..."):
 #        try:
