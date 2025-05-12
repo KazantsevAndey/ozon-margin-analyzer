@@ -53,9 +53,6 @@ if st.button("📊 Рассчитать (этап 2)"):
                 st.markdown("### ⬇️ Скачайте готовые Excel-отчёты")
                 st.download_button("📥 Отчёт по аккаунту", data=results["buffer_account"].getvalue(), file_name="account_summary.xlsx")
                 st.download_button("📥 Отчёт по SKU (юнит-экономика)", data=results["buffer_sku"].getvalue(), file_name="sku_unit_economics.xlsx")
-                st.markdown("### ⬇️ Скачайте готовые Excel-отчёты")
-                st.download_button("📥 Отчёт по аккаунту", data=results["📄 Буфер отчёта по аккаунту"].getvalue(), file_name="account_summary.xlsx")
-                st.download_button("📥 Отчёт по SKU (юнит-экономика)", data=results["📄 Буфер отчёта по SKU"].getvalue(), file_name="sku_unit_economics.xlsx")
                 st.session_state.results = results
 
                 # Отдельно рендерим таблицы
@@ -79,45 +76,41 @@ if st.button("📊 Рассчитать (этап 2)"):
 # GPT-анализ SKU
 # GPT-анализ отчёта по аккаунту
 
-if st.button("🧠 GPT-анализ отчётов"):
+if st.button("🤖 GPT-анализ отчётов"):
     with st.spinner("GPT анализирует отчёты..."):
         try:
-            # Чтение Excel-отчётов из буферов
-            df_account = pd.read_excel(results["📄 Буфер отчёта по аккаунту"], sheet_name=None)
-            df_sku = pd.read_excel(results["📄 Буфер отчёта по SKU"], sheet_name=None)
+            # Читаем Excel из буфера
+            df_account = pd.read_excel(results["buffer_account"], sheet_name=None)
+            df_sku = pd.read_excel(results["buffer_sku"], sheet_name=None)
 
-            # Собираем данные из всех листов (например, первые 10 строк каждого)
+            # Превращаем первые 10 строк каждого листа в текст
             account_text = ""
             for sheet, df in df_account.items():
-                account_text += f"\n--- {sheet} ---\n" + df.head(10).to_string(index=False)
+                account_text += f"\n--- {sheet} ---\n{df.head(10).to_string(index=False)}\n"
 
             sku_text = ""
             for sheet, df in df_sku.items():
-                sku_text += f"\n--- {sheet} ---\n" + df.head(10).to_string(index=False)
+                sku_text += f"\n--- {sheet} ---\n{df.head(10).to_string(index=False)}\n"
 
-            # Формируем промт
+            # Отправляем в GPT
             prompt = (
-                "Ты финансовый аналитик. Проанализируй отчёты по продажам: "
-                "1. Укажи ключевые статьи затрат и сравни маржу. "
-                "2. Найди товары с низкой маржой или высокой ДРР. "
-                "3. Сформулируй 3–5 рекомендаций по улучшению экономики.\n\n"
-                "📊 Отчёт по аккаунту:\n" + account_text +
-                "\n\n📦 Отчёт по SKU:\n" + sku_text
+                "Ты аналитик. Проанализируй отчёт по аккаунту и по SKU. "
+                "Укажи ключевые расходы, тренды и дай рекомендации по марже.\n\n"
+                f"📊 Отчёт по аккаунту:\n{account_text}\n"
+                f"📦 Отчёт по SKU:\n{sku_text}"
             )
 
-            # Запрос в GPT
             response = openai.chat.completions.create(
                 model="gpt-4",
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.3,
-                max_tokens=1000
+                temperature=0.4,
             )
 
-            st.subheader("📋 GPT-анализ отчётов")
+            st.subheader("📈 Рекомендации GPT")
             st.write(response.choices[0].message.content)
 
         except Exception as e:
-            st.error(f"Произошла ошибка при анализе: {e}")       
+            st.error(f"Ошибка анализа: {e}")
 #if st.button("🧠 Анализ показателей с помощью ИИ"):
 #    with st.spinner("Анализируем отчёты..."):
 #        try:
