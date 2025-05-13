@@ -73,11 +73,11 @@ if st.button("🧠 GPT-анализ отчётов"):
     else:
         with st.spinner("Анализируем отчёты..."):
             try:
-                insights_df = pd.read_excel(
-                    df_account = pd.read_excel(results["buffer_account"], sheet_name=None)
-                    df_insights = pd.read_excel(results["buffer_insights"], sheet_name=None)
-                    st.session_state.results["buffer_insights"], sheet_name=None
-                )
+                
+                df_account = pd.read_excel(results["buffer_account"], sheet_name=None)
+                df_insights = pd.read_excel(results["buffer_insights"], sheet_name=None)
+                #st.session_state.results["buffer_insights"], sheet_name=None
+                #)
 
                 # Склеиваем всё в одну строку
                 full_report = ""
