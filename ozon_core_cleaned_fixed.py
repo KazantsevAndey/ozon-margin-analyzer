@@ -1067,6 +1067,19 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
         final_result_yesterday.to_excel(writer, sheet_name="SKU вчера", index=False)
         final_result_month.to_excel(writer, sheet_name="SKU месяц", index=False)
 
+
+  
+    buffer_insights = io.BytesIO()
+
+    with pd.ExcelWriter(buffer_insights, engine="xlsxwriter") as writer:
+        low_margin_yesterday.to_excel(writer, sheet_name="Маржа <20% вчера", index=False)
+        high_drr_yesterday.to_excel(writer, sheet_name="Высокая ДРР вчера", index=False)
+        top_categories_yesterday.to_excel(writer, sheet_name="Категории вчера", index=False)
+
+        low_margin_month.to_excel(writer, sheet_name="Маржа <20% месяц", index=False)
+        high_drr_month.to_excel(writer, sheet_name="Высокая ДРР месяц", index=False)
+        top_categories_month.to_excel(writer, sheet_name="Категории месяц", index=False)
+
     
     return {
     "💰 Начисления за вчера": nachislen_yesterday,
@@ -1092,10 +1105,5 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     "📈 График: Топ-15 SKU по отгрузке": fig4,
     "buffer_account": buffer_account,
     "buffer_sku": buffer_sku,
-    "low_margin_yesterday": low_margin_yesterday,
-    "high_drr_yesterday": high_drr_yesterday,
-    "top_categories_yesterday": top_categories_yesterday,
-    "low_margin_month": low_margin_month,
-    "high_drr_month": high_drr_month,
-    "top_categories_month": top_categories_month
+    "buffer_insights": buffer_insights,
 }
