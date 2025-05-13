@@ -1017,33 +1017,47 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     plt.tight_layout()
 
 # Добавляем графики в results
-    def extract_insight_tables(df):
-        df = df.copy()
-        df = df[df['Сумма отгрузки'] > 0]
 
-        low_margin_sku = df[df['Маржинальность (%)'] < 20].sort_values(by='Маржинальность (%)')
-        high_drr_sku = df[(df['Маржинальность (%)'] >= 20) & (df['ДРР (%)'] > 15)].sort_values(by='ДРР (%)', ascending=False)
-
-        if 'Тип' in df.columns:
-            category_profit = df.groupby('Тип', as_index=False).agg({
-                'Сумма отгрузки': 'sum',
-                'Сумма себестоимости': 'sum',
-                'ДРР': 'sum'
-        })
-            category_profit['Маржа (%)'] = (
-                (category_profit['Сумма отгрузки'] - category_profit['Сумма себестоимости']) / category_profit['Сумма отгрузки'] * 100
-            ).round(2)
-            category_profit['Маржа с учетом ДРР (%)'] = (
-                (category_profit['Сумма отгрузки'] - category_profit['Сумма себестоимости'] - category_profit['ДРР']) / category_profit['Сумма отгрузки'] * 100
-            ).round(2)
-            top_categories = category_profit.sort_values(by='Сумма отгрузки', ascending=False).head(5)
-        else:
-            top_categories = pd.DataFrame()
-
-    return low_margin_sku, high_drr_sku, top_categories
-    # После финальных расчётов:
-    low_margin_yesterday, high_drr_yesterday, top_categories_yesterday = extract_insight_tables(final_result_yesterday)
-    low_margin_month, high_drr_month, top_categories_month = extract_insight_tables(final_result_month)
+    low_margin_yesterday = final_result_yesterday[final_result_yesterday['Маржинальность (%)'] < 20]
+    low_margin_month = final_result_month[final_result_month['Маржинальность (%)'] < 20]
+    high_drr_yesterday = final_result_yesterday[
+        (final_result_yesterday['Маржинальность (%)'] >= 20) &
+        (final_result_yesterday['ДРР (%)'] > 15)
+    ]
+    high_drr_month = final_result_month[
+        (final_result_month['Маржинальность (%)'] >= 20) &
+        (final_result_month['ДРР (%)'] > 15)
+    ]
+    category_profit_yesterday = final_result_yesterday.groupby('Тип', as_index=False).agg({
+        'Сумма отгрузки': 'sum',
+        'Сумма себестоимости': 'sum',
+        'ДРР': 'sum'
+    })
+    category_profit_yesterday['Маржа (%)'] = (
+        (category_profit_yesterday['Сумма отгрузки'] - category_profit_yesterday['Сумма себестоимости']) /
+        category_profit_yesterday['Сумма отгрузки'] * 100
+    ).round(2)
+    category_profit_yesterday['Маржа с учетом ДРР (%)'] = (
+        (category_profit_yesterday['Сумма отгрузки'] - category_profit_yesterday['Сумма себестоимости'] - category_profit_yesterday['ДРР']) /
+        category_profit_yesterday['Сумма отгрузки'] * 100
+    ).round(2)
+    top_categories_yesterday = category_profit_yesterday.sort_values(by='Сумма отгрузки', ascending=False).head(5)
+    category_profit_month = final_result_month.groupby('Тип', as_index=False).agg({
+        'Сумма отгрузки': 'sum',
+        'Сумма себестоимости': 'sum',
+        'ДРР': 'sum'
+    })
+    category_profit_month['Маржа (%)'] = (
+        (category_profit_month['Сумма отгрузки'] - category_profit_month['Сумма себестоимости']) /
+        category_profit_month['Сумма отгрузки'] * 100
+    ).round(2)
+    category_profit_month['Маржа с учетом ДРР (%)'] = (
+        (category_profit_month['Сумма отгрузки'] - category_profit_month['Сумма себестоимости'] - category_profit_month['ДРР']) /
+        category_profit_month['Сумма отгрузки'] * 100
+    ).round(2)
+    top_categories_month = category_profit_month.sort_values(by='Сумма отгрузки', ascending=False).head(5)
+    
+    
     buffer_account = io.BytesIO()
     buffer_sku = io.BytesIO()
 
@@ -1067,8 +1081,6 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
         final_result_yesterday.to_excel(writer, sheet_name="SKU вчера", index=False)
         final_result_month.to_excel(writer, sheet_name="SKU месяц", index=False)
 
-
-  
     buffer_insights = io.BytesIO()
 
     with pd.ExcelWriter(buffer_insights, engine="xlsxwriter") as writer:
@@ -1105,5 +1117,5 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     "📈 График: Топ-15 SKU по отгрузке": fig4,
     "buffer_account": buffer_account,
     "buffer_sku": buffer_sku,
-    "buffer_insights": buffer_insights,
+    "buffer_insights": buffer_insights
 }
