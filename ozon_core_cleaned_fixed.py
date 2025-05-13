@@ -1,12 +1,12 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from datetime import datetime, timedelta
-import requests
-import io
-
-    
 def calculate_all(api_key, perf_key, perf_client_id, price, client_id):  
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import pandas as pd
+    from datetime import datetime, timedelta
+    import requests
+    import io
+
+ 
     """Загрузили прайс с себестоимостью или взяли его с гугл диска."""
     
     #price.head()
