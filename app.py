@@ -68,42 +68,25 @@ if st.button("📊 Рассчитать (этап 2)"):
                 st.error(f"Произошла ошибка: {e}")
 
 if st.button("🧠 GPT-анализ отчётов"):
-    if "results" not in st.session_state:
+    if "results" not in st.session_state or "buffer_insights" not in st.session_state.results:
         st.error("Сначала рассчитай отчёты.")
     else:
-        with st.spinner("Анализируем отчёты (GPT-3.5)..."):
+        with st.spinner("Анализируем отчёты..."):
             try:
-                results = st.session_state.results
+                insights_df = pd.read_excel(
+                    st.session_state.results["buffer_insights"], sheet_name=None
+                )
 
-                # Конвертация всех 6 таблиц
-                low_margin_yesterday = results["low_margin_yesterday"].to_string(index=False)
-                high_drr_yesterday = results["high_drr_yesterday"].to_string(index=False)
-                top_categories_yesterday = results["top_categories_yesterday"].to_string(index=False)
+                # Склеиваем всё в одну строку
+                full_report = ""
+                for name, table in insights_df.items():
+                    full_report += f"\n\n{name}:\n{table.to_string(index=False)}"
 
-                low_margin_month = results["low_margin_month"].to_string(index=False)
-                high_drr_month = results["high_drr_month"].to_string(index=False)
-                top_categories_month = results["top_categories_month"].to_string(index=False)
-
-                # Промпт
                 prompt = (
-                    "Ты опытный аналитик маркетплейса. Перед тобой таблицы, описывающие продажи, маржинальность и рекламные затраты.\n"
-                    "Проанализируй их и выведи 5–7 ключевых наблюдений:\n"
-                    "- Где низкая маржа?\n"
-                    "- Какие товары убыточны?\n"
-                    "- Где реклама неэффективна?\n"
-                    "- Какие категории наиболее прибыльны?\n\n"
-                    "🔻 Низкая маржа вчера:\n"
-                    f"{low_margin_yesterday}\n\n"
-                    "🔻 Низкая маржа с начала месяца:\n"
-                    f"{low_margin_month}\n\n"
-                    "🔥 Высокая ДРР вчера:\n"
-                    f"{high_drr_yesterday}\n\n"
-                    "🔥 Высокая ДРР с начала месяца:\n"
-                    f"{high_drr_month}\n\n"
-                    "💰 Топ категории по прибыли вчера:\n"
-                    f"{top_categories_yesterday}\n\n"
-                    "💰 Топ категории по прибыли с начала месяца:\n"
-                    f"{top_categories_month}"
+                    "Ты аналитик маркетплейса. Проанализируй все эти таблицы:\n"
+                    "Найди проблемные товары, убыточные категории, плохие рекламные показатели.\n"
+                    "Сделай 5–7 рекомендаций по улучшению продаж и маржи:\n"
+                    f"{full_report}"
                 )
 
                 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
@@ -114,7 +97,7 @@ if st.button("🧠 GPT-анализ отчётов"):
                     max_tokens=2000
                 )
 
-                st.subheader("📋 GPT-анализ отчётов (3.5)")
+                st.subheader("📋 GPT-анализ отчётов")
                 st.write(response.choices[0].message.content)
 
             except Exception as e:
