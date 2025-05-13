@@ -67,38 +67,89 @@ if st.button("📊 Рассчитать (этап 2)"):
             except Exception as e:
                 st.error(f"Произошла ошибка: {e}")
 
-
-    #Кнопки скачивания Excel-отчётов
 if st.button("🧠 GPT-анализ отчётов"):
     if "results" not in st.session_state:
         st.error("Сначала рассчитай отчёты.")
     else:
-        with st.spinner("Анализируем отчёты..."):
+        with st.spinner("Анализируем отчёты (GPT-3.5)..."):
             try:
                 results = st.session_state.results
-                df_account = pd.read_excel(results["buffer_account"])
-                df_sku = pd.read_excel(results["buffer_sku"])
 
+                # Конвертация всех 6 таблиц
+                low_margin_yesterday = results["low_margin_yesterday"].to_string(index=False)
+                high_drr_yesterday = results["high_drr_yesterday"].to_string(index=False)
+                top_categories_yesterday = results["top_categories_yesterday"].to_string(index=False)
+
+                low_margin_month = results["low_margin_month"].to_string(index=False)
+                high_drr_month = results["high_drr_month"].to_string(index=False)
+                top_categories_month = results["top_categories_month"].to_string(index=False)
+
+                # Промпт
                 prompt = (
-                    "Ты аналитик маркетплейса. Проанализируй следующие Excel-отчёты. "
-                    "Выведи ключевые выводы по марже, затратам и товарам с проблемной экономикой.\n\n"
-                    f"Отчёт по аккаунту (первые 20 строк):\n{df_account.head(20).to_string(index=False)}\n\n"
-                    f"Отчёт по SKU (первые 20 строк):\n{df_sku.head(20).to_string(index=False)}"
+                    "Ты опытный аналитик маркетплейса. Перед тобой таблицы, описывающие продажи, маржинальность и рекламные затраты.\n"
+                    "Проанализируй их и выведи 5–7 ключевых наблюдений:\n"
+                    "- Где низкая маржа?\n"
+                    "- Какие товары убыточны?\n"
+                    - Где реклама неэффективна?\n"
+                    "- Какие категории наиболее прибыльны?\n\n"
+                    "🔻 Низкая маржа вчера:\n"
+                    f"{low_margin_yesterday}\n\n"
+                    "🔻 Низкая маржа с начала месяца:\n"
+                    f"{low_margin_month}\n\n"
+                    "🔥 Высокая ДРР вчера:\n"
+                    f"{high_drr_yesterday}\n\n"
+                    "🔥 Высокая ДРР с начала месяца:\n"
+                    f"{high_drr_month}\n\n"
+                    "💰 Топ категории по прибыли вчера:\n"
+                    f"{top_categories_yesterday}\n\n"
+                    "💰 Топ категории по прибыли с начала месяца:\n"
+                    f"{top_categories_month}"
                 )
 
                 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
                 response = client.chat.completions.create(
-                    model="gpt-4",
+                    model="gpt-3.5-turbo",
                     messages=[{"role": "user", "content": prompt}],
-                    temperature=0.3,
-                    max_tokens=1000
+                    temperature=0.4,
+                    max_tokens=2000
                 )
 
-                st.subheader("📋 GPT-анализ отчётов")
+                st.subheader("📋 GPT-анализ отчётов (3.5)")
                 st.write(response.choices[0].message.content)
 
             except Exception as e:
                 st.error(f"Ошибка при анализе: {e}")
+    #Кнопки скачивания Excel-отчётов
+#if st.button("🧠 GPT-анализ отчётов"):
+#    if "results" not in st.session_state:
+#        st.error("Сначала рассчитай отчёты.")
+#    else:
+#        with st.spinner("Анализируем отчёты..."):
+#            try:
+#                results = st.session_state.results
+#                df_account = pd.read_excel(results["buffer_account"])
+#                df_sku = pd.read_excel(results["buffer_sku"])#
+
+#                prompt = (
+#                   "Ты аналитик маркетплейса. Проанализируй следующие Excel-отчёты. "
+#                    "Выведи ключевые выводы по марже, затратам и товарам с проблемной экономикой.\n\n"
+#                    f"Отчёт по аккаунту (первые 20 строк):\n{df_account.head(20).to_string(index=False)}\n\n"
+#                    f"Отчёт по SKU (первые 20 строк):\n{df_sku.head(20).to_string(index=False)}"
+#                )   
+
+ #               client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+ #               response = client.chat.completions.create(
+ #                   model="gpt-4",
+ #                   messages=[{"role": "user", "content": prompt}],
+ #                   temperature=0.3,
+ #                   max_tokens=1000
+ #               )
+
+#                st.subheader("📋 GPT-анализ отчётов")
+#                st.write(response.choices[0].message.content)
+
+#            except Exception as e:
+#                st.error(f"Ошибка при анализе: {e}")
 
 # if st.button("🧠 Анализ показателей с помощью ИИ"): 
    # with st.spinner("Анализируем отчёты..."):
