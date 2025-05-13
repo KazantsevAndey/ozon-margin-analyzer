@@ -1,13 +1,12 @@
-def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import pandas as pd
-    from datetime import datetime, timedelta
-    import requests
-    import io
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from datetime import datetime, timedelta
+import requests
+import io
 
     
-    
+def calculate_all(api_key, perf_key, perf_client_id, price, client_id):  
     """Загрузили прайс с себестоимостью или взяли его с гугл диска."""
     
     #price.head()
@@ -1018,7 +1017,33 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     plt.tight_layout()
 
 # Добавляем графики в results
+    def extract_insight_tables(df):
+    df = df.copy()
+    df = df[df['Сумма отгрузки'] > 0]
 
+    low_margin_sku = df[df['Маржинальность (%)'] < 20].sort_values(by='Маржинальность (%)')
+    high_drr_sku = df[(df['Маржинальность (%)'] >= 20) & (df['ДРР (%)'] > 15)].sort_values(by='ДРР (%)', ascending=False)
+
+    if 'Тип' in df.columns:
+        category_profit = df.groupby('Тип', as_index=False).agg({
+            'Сумма отгрузки': 'sum',
+            'Сумма себестоимости': 'sum',
+            'ДРР': 'sum'
+        })
+        category_profit['Маржа (%)'] = (
+            (category_profit['Сумма отгрузки'] - category_profit['Сумма себестоимости']) / category_profit['Сумма отгрузки'] * 100
+        ).round(2)
+        category_profit['Маржа с учетом ДРР (%)'] = (
+            (category_profit['Сумма отгрузки'] - category_profit['Сумма себестоимости'] - category_profit['ДРР']) / category_profit['Сумма отгрузки'] * 100
+        ).round(2)
+        top_categories = category_profit.sort_values(by='Сумма отгрузки', ascending=False).head(5)
+    else:
+        top_categories = pd.DataFrame()
+
+    return low_margin_sku, high_drr_sku, top_categories
+    # После финальных расчётов:
+    low_margin_yesterday, high_drr_yesterday, top_categories_yesterday = extract_insight_tables(final_result_yesterday)
+    low_margin_month, high_drr_month, top_categories_month = extract_insight_tables(final_result_month)
     buffer_account = io.BytesIO()
     buffer_sku = io.BytesIO()
 
@@ -1066,5 +1091,11 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     "📈 График: Отгрузка vs Прибыль (столбики)": fig3,
     "📈 График: Топ-15 SKU по отгрузке": fig4,
     "buffer_account": buffer_account,
-    "buffer_sku": buffer_sku
+    "buffer_sku": buffer_sku,
+    "low_margin_yesterday": low_margin_yesterday,
+    "high_drr_yesterday": high_drr_yesterday,
+    "top_categories_yesterday": top_categories_yesterday,
+    "low_margin_month": low_margin_month,
+    "high_drr_month": high_drr_month,
+    "top_categories_month": top_categories_month
 }
