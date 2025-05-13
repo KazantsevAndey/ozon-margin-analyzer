@@ -1018,27 +1018,27 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
 
 # Добавляем графики в results
     def extract_insight_tables(df):
-    df = df.copy()
-    df = df[df['Сумма отгрузки'] > 0]
+        df = df.copy()
+        df = df[df['Сумма отгрузки'] > 0]
 
-    low_margin_sku = df[df['Маржинальность (%)'] < 20].sort_values(by='Маржинальность (%)')
-    high_drr_sku = df[(df['Маржинальность (%)'] >= 20) & (df['ДРР (%)'] > 15)].sort_values(by='ДРР (%)', ascending=False)
+        low_margin_sku = df[df['Маржинальность (%)'] < 20].sort_values(by='Маржинальность (%)')
+        high_drr_sku = df[(df['Маржинальность (%)'] >= 20) & (df['ДРР (%)'] > 15)].sort_values(by='ДРР (%)', ascending=False)
 
-    if 'Тип' in df.columns:
-        category_profit = df.groupby('Тип', as_index=False).agg({
-            'Сумма отгрузки': 'sum',
-            'Сумма себестоимости': 'sum',
-            'ДРР': 'sum'
+        if 'Тип' in df.columns:
+            category_profit = df.groupby('Тип', as_index=False).agg({
+                'Сумма отгрузки': 'sum',
+                'Сумма себестоимости': 'sum',
+                'ДРР': 'sum'
         })
-        category_profit['Маржа (%)'] = (
-            (category_profit['Сумма отгрузки'] - category_profit['Сумма себестоимости']) / category_profit['Сумма отгрузки'] * 100
-        ).round(2)
-        category_profit['Маржа с учетом ДРР (%)'] = (
-            (category_profit['Сумма отгрузки'] - category_profit['Сумма себестоимости'] - category_profit['ДРР']) / category_profit['Сумма отгрузки'] * 100
-        ).round(2)
-        top_categories = category_profit.sort_values(by='Сумма отгрузки', ascending=False).head(5)
-    else:
-        top_categories = pd.DataFrame()
+            category_profit['Маржа (%)'] = (
+                (category_profit['Сумма отгрузки'] - category_profit['Сумма себестоимости']) / category_profit['Сумма отгрузки'] * 100
+            ).round(2)
+            category_profit['Маржа с учетом ДРР (%)'] = (
+                (category_profit['Сумма отгрузки'] - category_profit['Сумма себестоимости'] - category_profit['ДРР']) / category_profit['Сумма отгрузки'] * 100
+            ).round(2)
+            top_categories = category_profit.sort_values(by='Сумма отгрузки', ascending=False).head(5)
+        else:
+            top_categories = pd.DataFrame()
 
     return low_margin_sku, high_drr_sku, top_categories
     # После финальных расчётов:
