@@ -42,6 +42,7 @@ else:
     st.info("⚠️ Ручной ввод пока не реализован. Используйте Excel.")
 
 # Кнопка запуска
+
 if st.button("📊 Рассчитать (этап 2)"):
     if not api_key or not perf_key or not client_id or price is None:
         st.error("Пожалуйста, заполните все поля и загрузите прайс.")
@@ -50,11 +51,42 @@ if st.button("📊 Рассчитать (этап 2)"):
             try:
                 results = calculate_all(api_key, perf_key, perf_client_id, price, client_id)
                 st.session_state.results = results
+                st.session_state.show_results = True
                 st.success("Расчёт выполнен успешно!")
-                st.markdown("### ⬇️ Скачайте готовые Excel-отчёты")
-                st.download_button("📥 Отчёт по аккаунту", data=results["buffer_account"].getvalue(), file_name="account_summary.xlsx")
-                st.download_button("📥 Отчёт по SKU (юнит-экономика)", data=results["buffer_sku"].getvalue(), file_name="sku_unit_economics.xlsx")
-                st.session_state.results = results
+            except Exception as e:
+                st.session_state.show_results = False
+                st.error(f"Произошла ошибка: {e}")
+
+# 👇 Показываем результаты, если они уже есть
+if st.session_state.get("show_results") and "results" in st.session_state:
+    st.markdown("### ⬇️ Скачайте готовые Excel-отчёты")
+    st.download_button("📥 Отчёт по аккаунту", data=st.session_state.results["buffer_account"].getvalue(), file_name="account_summary.xlsx")
+    st.download_button("📥 Отчёт по SKU (юнит-экономика)", data=st.session_state.results["buffer_sku"].getvalue(), file_name="sku_unit_economics.xlsx")
+
+    for name, value in st.session_state.results.items():
+        if name.startswith("buffer"):  # не отображаем буферы
+            continue
+        st.subheader(name)
+        if isinstance(value, plt.Figure):
+            st.pyplot(value)
+        elif isinstance(value, pd.DataFrame):
+            st.dataframe(value, use_container_width=True)
+
+
+
+#if st.button("📊 Рассчитать (этап 2)"):
+#    if not api_key or not perf_key or not client_id or price is None:
+#        st.error("Пожалуйста, заполните все поля и загрузите прайс.")
+#    else:
+#        with st.spinner("Выполняется расчёт..."):
+#            try:
+#                results = calculate_all(api_key, perf_key, perf_client_id, price, client_id)
+#                st.session_state.results = results
+#                st.success("Расчёт выполнен успешно!")
+#                st.markdown("### ⬇️ Скачайте готовые Excel-отчёты")
+#                st.download_button("📥 Отчёт по аккаунту", data=results["buffer_account"].getvalue(), file_name="account_summary.xlsx")
+#                st.download_button("📥 Отчёт по SKU (юнит-экономика)", data=results["buffer_sku"].getvalue(), file_name="sku_unit_economics.xlsx")
+#                st.session_state.results = results
 
                 # Отдельно рендерим таблицы
       #          for name, value in results.items():
