@@ -51,6 +51,9 @@ if st.button("📊 Рассчитать (этап 2)"):
             try:
                 results = calculate_all(api_key, perf_key, perf_client_id, price, client_id)
                 st.session_state.results = results
+                st.write("🔍 Содержимое results:")
+                for key in results:
+                    st.write("-", key)
                 st.session_state.show_results = True
                 st.success("Расчёт выполнен успешно!")
             except Exception as e:
