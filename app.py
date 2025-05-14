@@ -95,13 +95,13 @@ if st.session_state.get("show_results") and "results" in st.session_state:
       #                  st.pyplot(value)
       #              else:
       #                  st.dataframe(value, use_container_width=True)
-                for name, value in results.items():
-                    if isinstance(value, plt.Figure):
-                        st.subheader(f"{name}")
-                        st.pyplot(value)
-                    elif isinstance(value, pd.DataFrame):
-                        st.subheader(f"{name}")
-                        st.dataframe(value, use_container_width=True)
+      #          for name, value in results.items():
+      #              if isinstance(value, plt.Figure):
+      #                  st.subheader(f"{name}")
+      #                  st.pyplot(value)
+      #              elif isinstance(value, pd.DataFrame):
+      #                  st.subheader(f"{name}")
+      #                  st.dataframe(value, use_container_width=True)
     # иначе — это buffer, не показываем
 
             except Exception as e:
