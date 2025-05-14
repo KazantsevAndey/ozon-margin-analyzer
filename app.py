@@ -67,6 +67,103 @@ if st.button("📊 Рассчитать (этап 2)"):
             except Exception as e:
                 st.error(f"Произошла ошибка: {e}")
 
+
+if st.button("🧠 AI анализ отчётов"):
+    if "results" not in st.session_state or "buffer_insights" not in st.session_state.results:
+        st.error("Сначала рассчитай отчёты.")
+    else:
+        with st.spinner("Анализируем отчёты по блокам..."):
+            try:
+                import pandas as pd
+                from openai import OpenAI
+
+                df_account = pd.read_excel(st.session_state.results["buffer_account"], sheet_name=None)
+                df_insights = pd.read_excel(st.session_state.results["buffer_insights"], sheet_name=None)
+
+                # Извлекаем нужные блоки
+                margin_yesterday = df_account.get("Итоги вчера", pd.DataFrame()).get("Маржа", [None])[0]
+                margin_month = df_account.get("Итоги месяц", pd.DataFrame()).get("Маржа", [None])[0]
+
+                low_margin_yesterday = df_insights.get("low_margin_yesterday", pd.DataFrame()).to_string(index=False)
+                low_margin_month = df_insights.get("low_margin_month", pd.DataFrame()).to_string(index=False)
+                high_drr_yesterday = df_insights.get("high_drr_yesterday", pd.DataFrame()).to_string(index=False)
+                high_drr_month = df_insights.get("high_drr_month", pd.DataFrame()).to_string(index=False)
+                top_categories_yesterday = df_insights.get("top_categories_yesterday", pd.DataFrame()).to_string(index=False)
+                top_categories_month = df_insights.get("top_categories_month", pd.DataFrame()).to_string(index=False)
+
+                client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
+                prompt_blocks = [
+                    {
+                        "title": "1. 📊 Общая ситуация по марже",
+                        "template": f"""
+Ты аналитик маркетплейса Ozon. Посмотри на следующие цифры:
+• Маржа за вчера: {margin_yesterday}%.
+• Маржа за месяц: {margin_month}%.
+
+Сравни эти два значения и кратко напиши:
+• Какая маржа выше.
+• Одним простым предложением сделай вывод: улучшилась или ухудшилась ситуация с маржой.
+"""
+                    },
+                    {
+                        "title": "2. ⚠️ Проблемные товары с низкой маржой",
+                        "template": f"""
+Вот список товаров с маржой менее 20%:
+
+За вчера:
+{low_margin_yesterday}
+
+За месяц:
+{low_margin_month}
+
+В конце добавь: «Обратите внимание на эти товары — маржа по ним ниже 20%.»
+"""
+                    },
+                    {
+                        "title": "3. 💸 Товары с высокой ДРР",
+                        "template": f"""
+Вот товары, у которых реклама съедает большую часть прибыли:
+
+За вчера:
+{high_drr_yesterday}
+
+За месяц:
+{high_drr_month}
+
+В конце добавь: «Проверьте рекламные кампании — реклама съедает прибыль.»
+"""
+                    },
+                    {
+                        "title": "4. 💰 Категории-лидеры по прибыли",
+                        "template": f"""
+Вот топ-3 категории по прибыли:
+
+За вчера:
+{top_categories_yesterday}
+
+За месяц:
+{top_categories_month}
+
+В конце добавь: «Эти категории приносят наибольшую прибыль.»
+"""
+                    }
+                ]
+
+                for block in prompt_blocks:
+                    with st.spinner(block["title"]):
+                        response = client.chat.completions.create(
+                            model="gpt-3.5-turbo",
+                            messages=[{"role": "user", "content": block["template"]}],
+                            temperature=0.4,
+                            max_tokens=1000
+                        )
+                        st.subheader(block["title"])
+                        st.write(response.choices[0].message.content)
+
+            except Exception as e:
+                st.error(f"Ошибка при анализе: {e}")
+
 if st.button("🧠 GPT-3 анализ отчётов"):
     if "results" not in st.session_state or "buffer_insights" not in st.session_state.results:
         st.error("Сначала рассчитай отчёты.")
