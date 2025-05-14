@@ -104,8 +104,8 @@ if st.session_state.get("show_results") and "results" in st.session_state:
       #                  st.dataframe(value, use_container_width=True)
     # иначе — это buffer, не показываем
 
-            except Exception as e:
-                st.error(f"Произошла ошибка: {e}")
+      #      except Exception as e:
+      #          st.error(f"Произошла ошибка: {e}")
 
 
 
