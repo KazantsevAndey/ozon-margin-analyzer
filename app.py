@@ -69,11 +69,18 @@ if st.session_state.get("show_results") and "results" in st.session_state:
     for name, value in st.session_state.results.items():
         if name.startswith("buffer"):  # не отображаем буферы
             continue
+
         st.subheader(name)
+
         if isinstance(value, plt.Figure):
             st.pyplot(value)
         elif isinstance(value, pd.DataFrame):
             st.dataframe(value, use_container_width=True)
+        elif isinstance(value, dict):
+            for k, v in value.items():
+                st.markdown(f"**{k}**: {v}")
+        else:
+            st.write(value)
 
 
 
