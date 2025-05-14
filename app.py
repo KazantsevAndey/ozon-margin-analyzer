@@ -57,12 +57,20 @@ if st.button("📊 Рассчитать (этап 2)"):
                 st.session_state.results = results
 
                 # Отдельно рендерим таблицы
+      #          for name, value in results.items():
+      #              st.subheader(f"{name}")
+      #              if isinstance(value, plt.Figure):
+      #                  st.pyplot(value)
+      #              else:
+      #                  st.dataframe(value, use_container_width=True)
                 for name, value in results.items():
-                    st.subheader(f"{name}")
                     if isinstance(value, plt.Figure):
+                        st.subheader(f"{name}")
                         st.pyplot(value)
-                    else:
+                    elif isinstance(value, pd.DataFrame):
+                        st.subheader(f"{name}")
                         st.dataframe(value, use_container_width=True)
+    # иначе — это buffer, не показываем
 
             except Exception as e:
                 st.error(f"Произошла ошибка: {e}")
