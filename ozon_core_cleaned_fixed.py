@@ -871,11 +871,11 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
             'ДРР': 'sum'
         })
     
-        grouped['Маржа (%)'] = (
+        grouped['Маржинальность (%)'] = (
             (grouped['Сумма отгрузки'] - grouped['Сумма себестоимости']) / grouped['Сумма отгрузки'] * 100
         ).round(2)
     
-        grouped['Маржа с учетом ДРР (%)'] = (
+        grouped['ММаржинальность с учетом ДРР (%)'] = (
             (grouped['Сумма отгрузки'] - grouped['Сумма себестоимости'] - grouped['ДРР']) / grouped['Сумма отгрузки'] * 100
         ).round(2)
     
@@ -1033,11 +1033,11 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
         'Сумма себестоимости': 'sum',
         'ДРР': 'sum'
     })
-    category_profit_yesterday['Маржа (%)'] = (
+    category_profit_yesterday['Маржинальность (%)'] = (
         (category_profit_yesterday['Сумма отгрузки'] - category_profit_yesterday['Сумма себестоимости']) /
         category_profit_yesterday['Сумма отгрузки'] * 100
     ).round(2)
-    category_profit_yesterday['Маржа с учетом ДРР (%)'] = (
+    category_profit_yesterday['Маржинальность с учетом ДРР (%)'] = (
         (category_profit_yesterday['Сумма отгрузки'] - category_profit_yesterday['Сумма себестоимости'] - category_profit_yesterday['ДРР']) /
         category_profit_yesterday['Сумма отгрузки'] * 100
     ).round(2)
@@ -1047,11 +1047,11 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
         'Сумма себестоимости': 'sum',
         'ДРР': 'sum'
     })
-    category_profit_month['Маржа (%)'] = (
+    category_profit_month['Маржинальность (%)'] = (
         (category_profit_month['Сумма отгрузки'] - category_profit_month['Сумма себестоимости']) /
         category_profit_month['Сумма отгрузки'] * 100
     ).round(2)
-    category_profit_month['Маржа с учетом ДРР (%)'] = (
+    category_profit_month['Маржинальность с учетом ДРР (%)'] = (
         (category_profit_month['Сумма отгрузки'] - category_profit_month['Сумма себестоимости'] - category_profit_month['ДРР']) /
         category_profit_month['Сумма отгрузки'] * 100
     ).round(2)
@@ -1068,13 +1068,13 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
             "Себестоимость": total_sebestoimost_yesterday,
             "Отгрузка": total_otgruzka_yesterday,
             "Доля себестоимости": sebestoimost_ratio_yesterday,
-            "Маржа": marzha_percentage_yesterday
+            "Маржинальность": marzha_percentage_yesterday
         }]).to_excel(writer, sheet_name="Итоги вчера", index=False)
         pd.DataFrame([{
             "Себестоимость": total_sebestoimost_month,
             "Отгрузка": total_otgruzka_month,
             "Доля себестоимости": sebestoimost_ratio_month,
-            "Маржа": marzha_percentage_month
+            "Маржинальность": marzha_percentage_month
         }]).to_excel(writer, sheet_name="Итоги месяц", index=False)
 
     with pd.ExcelWriter(buffer_sku, engine="xlsxwriter") as writer:
@@ -1084,11 +1084,11 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     buffer_insights = io.BytesIO()
 
     with pd.ExcelWriter(buffer_insights, engine="xlsxwriter") as writer:
-        low_margin_yesterday.to_excel(writer, sheet_name="Маржа <20% вчера", index=False)
+        low_margin_yesterday.to_excel(writer, sheet_name="Маржинальность <20% вчера", index=False)
         high_drr_yesterday.to_excel(writer, sheet_name="Высокая ДРР вчера", index=False)
         top_categories_yesterday.to_excel(writer, sheet_name="Категории вчера", index=False)
 
-        low_margin_month.to_excel(writer, sheet_name="Маржа <20% месяц", index=False)
+        low_margin_month.to_excel(writer, sheet_name="Маржинальность <20% месяц", index=False)
         high_drr_month.to_excel(writer, sheet_name="Высокая ДРР месяц", index=False)
         top_categories_month.to_excel(writer, sheet_name="Категории месяц", index=False)
 
