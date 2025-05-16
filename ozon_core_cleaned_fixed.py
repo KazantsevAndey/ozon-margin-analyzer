@@ -271,7 +271,7 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
         print(f"Общая себестоимость: {total_sebestoimost_yesterday} руб.")
         print(f"Общая сумма отгрузки: {total_otgruzka_yesterday} руб.")
         print(f"Доля себестоимости: {sebestoimost_ratio_yesterday}%")
-        print(f"Маржа: {marzha_percentage_yesterday}%")
+        print(f"Маржинальность: {marzha_percentage_yesterday}%")
     else:
         print("⚠ Не найдены необходимые колонки в данных за вчера.")
     
@@ -290,11 +290,11 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
         print(f"Общая себестоимость: {total_sebestoimost_month} руб.")
         print(f"Общая сумма отгрузки: {total_otgruzka_month} руб.")
         print(f"Доля себестоимости: {sebestoimost_ratio_month}%")
-        print(f"Маржа: {marzha_percentage_month}%")
+        print(f"Маржинальность: {marzha_percentage_month}%")
     else:
         print("⚠ Не найдены необходимые колонки в данных с начала месяца.")
     
-    """## Расчёт маржи
+    """## Расчёт Маржинальности
     
     Если в таблицах начислений (`nachislen`) и финальных таблицах с себестоимостью есть нужные колонки,  
     считаем следующие показатели:
@@ -731,14 +731,14 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     )
     
     
-    final_result_yesterday['Маржа с учетом ДРР'] = (
+    final_result_yesterday['Маржинальность с учетом ДРР'] = (
         (final_result_yesterday['Сумма отгрузки'] -
          final_result_yesterday['Сумма себестоимости'] -
          final_result_yesterday['ДРР']) /
         final_result_yesterday['Сумма отгрузки'] * 100
     ).fillna(0).round(2)
     
-    final_result_month['Маржа с учетом ДРР'] = (
+    final_result_month['Маржинальность с учетом ДРР'] = (
         (final_result_month['Сумма отгрузки'] -
          final_result_month['Сумма себестоимости'] -
          final_result_month['ДРР']) /
