@@ -796,7 +796,7 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
         'Маржинальность (%)',
         'Доля продаж (%)',
         'ДРР (%)',
-        'Маржа с учетом ДРР'
+        'Маржинальность с учетом ДРР'
     ]
     final_result_month[cols_to_round] = final_result_month[cols_to_round].astype(float).round(2)
     final_result_yesterday[cols_to_round] = final_result_yesterday[cols_to_round].astype(float).round(2)
