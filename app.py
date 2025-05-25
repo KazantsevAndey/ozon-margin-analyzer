@@ -146,7 +146,7 @@ if st.button("Анализ продаж AI"):
 
                 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
                 response = client.chat.completions.create(
-                    model="gpt-3.5-turbo",
+                    model="gpt-4o",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0.4,
                     max_tokens=2000
