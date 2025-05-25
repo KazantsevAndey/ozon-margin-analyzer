@@ -983,7 +983,8 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     ax2.barh(df2['Тип'], df2['Прибыль'], color='red', label='Прибыль')
     for i, (y, profit) in enumerate(zip(df2['Тип'], df2['Прибыль'])):
         ax2.text(profit + 1000, i, f'{profit:,.0f}', va='center', fontsize=8)
-    ax2.set_xlabel('₽')
+    ax2.set_xlabel('Сумма отгрузки(руб)')
+    ax2.set_ylabel('Категория товаров', fontsize=12)
     ax2.set_title('Сравнение отгрузки и прибыли по категориям (за вчера)')
     ax2.grid(axis='x', linestyle='--', alpha=0.5)
     ax2.legend()
@@ -995,7 +996,7 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     fig3, ax3 = plt.subplots(figsize=(10, 6))
     bars1 = ax3.bar(x - width/2, df2['Сумма отгрузки'], width, label='Сумма отгрузки', color='#4C72B0')
     bars2 = ax3.bar(x + width/2, df2['Прибыль'], width, label='Прибыль', color='#DD8452')
-    ax3.set_ylabel('₽')
+    ax3.set_ylabel('Сумма(руб)')
     ax3.set_title('Отгрузка и прибыль по категориям (за вчера)')
     ax3.set_xticks(x)
     ax3.set_xticklabels(df2['Тип'], rotation=45)
