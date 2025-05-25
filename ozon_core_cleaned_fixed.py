@@ -998,7 +998,7 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
     bars1 = ax3.bar(x - width/2, df2['Сумма отгрузки'], width, label='Сумма отгрузки', color='#4C72B0')
     bars2 = ax3.bar(x + width/2, df2['Прибыль'], width, label='Прибыль', color='#DD8452')
     ax3.set_ylabel('Сумма(руб)')
-    ax3.set_ylabel('Категория товаров', fontsize=12)
+    ax3.set_xlabel('Категория товаров', fontsize=12)
     ax3.set_title('Отгрузка и прибыль по категориям (за вчера)')
     ax3.set_xticks(x)
     ax3.set_xticklabels(df2['Тип'], rotation=45)
@@ -1014,7 +1014,7 @@ def calculate_all(api_key, perf_key, perf_client_id, price, client_id):
         ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 2000,
              f'{bar.get_height():,.0f} ₽', ha='center', va='bottom', fontsize=8)
     ax4.set_ylabel('Сумма отгрузки(руб)')
-    ax4.set_ylabel('Наименование SKU', fontsize=12)
+    ax4.set_xlabel('Наименование SKU', fontsize=12)
     ax4.set_title('Топ-15 товаров по сумме отгрузки (за вчера)')
     ax4.set_xticklabels(df_sku['name'], rotation=75, ha='right')
     ax4.grid(axis='y', linestyle='--', alpha=0.3)
