@@ -42,19 +42,31 @@ else:
    
     st.markdown("#### Или скачайте шаблон для ручного заполнения себестоимости")
 
-    if st.button("📥 Скачать шаблон Excel для себестоимости"):
-        template_df = pd.DataFrame(columns=["Ozon SKU ID", "Цена в рублях"])
+     if st.button("📥 Скачать шаблон Excel для себестоимости"):
+        template_df = pd.DataFrame(columns=["Ozon SKU ID", "Цена в рублях", "Тип"])
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
             template_df.to_excel(writer, index=False, sheet_name="Template")
         output.seek(0)
 
         st.download_button(
-            label="Скачать шаблон",
+            label="📥 Скачать шаблон Excel",
             data=output,
             file_name="шаблон_себестоимости.xlsx",
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
+
+        # 👇 Добавляем загрузку шаблона тут же
+        uploaded_price_file = st.file_uploader("📤 Загрузите заполненный шаблон", type=["xlsx"], key="upload_price_file")
+
+        if uploaded_price_file is not None:
+            try:
+                price = pd.read_excel(uploaded_price_file)
+                st.success("✅ Шаблон успешно загружен.")
+                st.dataframe(price)
+            except Exception as e:
+                st.error(f"❌ Ошибка при чтении файла: {e}")
+                price = None
 
 
 
