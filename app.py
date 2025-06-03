@@ -25,7 +25,7 @@ with st.sidebar:
 
 
 st.markdown("### 📦 Загрузите прайс-лист или заполните вручную")
-upload_method = st.radio("Выберите способ:", ["Загрузить Excel", "Заполнить вручную"])
+upload_method = st.radio("Выберите способ:", ["Загрузить Excel", "Заполнить шаблон"])
 
 price = None
 
@@ -39,7 +39,22 @@ if upload_method == "Загрузить Excel":
         except Exception as e:
             st.error(f"Ошибка при чтении Excel-файла: {e}")
 else:
-    st.info("⚠️ Ручной ввод пока не реализован. Используйте Excel.")
+   
+    st.markdown("#### Или скачайте шаблон для ручного заполнения себестоимости")
+
+    if st.button("📥 Скачать шаблон Excel для себестоимости"):
+        template_df = pd.DataFrame(columns=["Ozon SKU ID", "Цена в рублях"])
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            template_df.to_excel(writer, index=False, sheet_name="Template")
+        output.seek(0)
+
+        st.download_button(
+            label="Скачать шаблон",
+            data=output,
+            file_name="шаблон_себестоимости.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
 
 
 
