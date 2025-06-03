@@ -23,51 +23,34 @@ with st.sidebar:
     perf_client_id = st.text_input("Performance Client ID")
     st.markdown("Ключи сохраняются только в сессии и не передаются третьим лицам.")
 
+st.markdown("### 📦 Загрузите прайс-лист")
 
-st.markdown("### 📦 Загрузите прайс-лист или заполните вручную")
-upload_method = st.radio("Выберите способ:", ["Загрузить Excel", "Заполнить шаблон"])
+# 📥 Кнопка: скачать шаблон
+template_df = pd.DataFrame(columns=["Ozon SKU ID", "Цена в рублях", "Тип"])
+output = io.BytesIO()
+with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+    template_df.to_excel(writer, index=False, sheet_name="Template")
+output.seek(0)
+
+st.download_button(
+    label="📥 Скачать шаблон Excel",
+    data=output,
+    file_name="шаблон_прайс-листа.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+
+# 📤 Загрузка Excel файла
+uploaded_file = st.file_uploader("📤 Загрузите .xlsx прайс-лист", type="xlsx")
 
 price = None
+if uploaded_file is not None:
+    try:
+        price = pd.read_excel(uploaded_file)
+        st.success("✅ Прайс-лист успешно загружен.")
+        st.dataframe(price)
+    except Exception as e:
+        st.error(f"❌ Ошибка при чтении Excel-файла: {e}")
 
-if upload_method == "Загрузить Excel":
-    uploaded_file = st.file_uploader("Загрузите .xlsx файл с прайс-листом", type="xlsx")
-    if uploaded_file is not None:
-        try:
-            price = pd.read_excel(uploaded_file)
-            st.session_state["price_from_template"] = price
-            st.success("Файл успешно загружен.")
-            st.dataframe(price)
-        except Exception as e:
-            st.error(f"Ошибка при чтении Excel-файла: {e}")
-else:
-   
-    st.markdown("#### Или скачайте шаблон для ручного заполнения себестоимости")
-
-    if st.button("📥 Скачать шаблон Excel для себестоимости"):
-        template_df = pd.DataFrame(columns=["Ozon SKU ID", "Цена в рублях", "Тип"])
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-            template_df.to_excel(writer, index=False, sheet_name="Template")
-        output.seek(0)
-
-        st.download_button(
-            label="📥 Скачать шаблон Excel",
-            data=output,
-            file_name="шаблон_себестоимости.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
-
-        # 👇 Добавляем загрузку шаблона тут же
-        uploaded_price_file = st.file_uploader("📤 Загрузите заполненный шаблон", type=["xlsx"], key="upload_price_file")
-
-        if uploaded_price_file is not None:
-            try:
-                price = pd.read_excel(uploaded_price_file)
-                st.success("✅ Шаблон успешно загружен.")
-                st.dataframe(price)
-            except Exception as e:
-                st.error(f"❌ Ошибка при чтении файла: {e}")
-                price = None
 
 
 
