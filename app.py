@@ -42,7 +42,7 @@ else:
    
     st.markdown("#### Или скачайте шаблон для ручного заполнения себестоимости")
 
-     if st.button("📥 Скачать шаблон Excel для себестоимости"):
+    if st.button("📥 Скачать шаблон Excel для себестоимости"):
         template_df = pd.DataFrame(columns=["Ozon SKU ID", "Цена в рублях", "Тип"])
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
