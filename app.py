@@ -10,9 +10,9 @@ import io
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.set_page_config(page_title="Ozon Margin Analyzer", layout="wide")
-st.title("🧾 Ozon Margin Analyzer")
+st.title("Автоматический анализ рентабельности для селлера Озон")
 #results = st.session_state.get("results")
-st.subheader("🚀 Загрузите прайс-лист и введите ключи")
+st.subheader("Загрузите прайс-лист и введите ключи(этап 1)")
 
 
 with st.sidebar:
@@ -23,7 +23,7 @@ with st.sidebar:
     perf_client_id = st.text_input("Performance Client ID")
     st.markdown("Ключи сохраняются только в сессии и не передаются третьим лицам.")
 
-st.markdown("### 📦 Загрузите прайс-лист")
+#st.markdown("### 📦 Загрузите прайс-лист")
 
 # 📥 Кнопка: скачать шаблон
 template_df = pd.DataFrame(columns=["Ozon SKU ID", "Цена в рублях", "Тип"])
@@ -97,7 +97,7 @@ if st.session_state.get("show_results") and "results" in st.session_state:
 
 
 
-if st.button("Анализ продаж AI"):
+if st.button("Анализ продаж AI(этап 3"):
     if "results" not in st.session_state or "buffer_insights" not in st.session_state.results:
         st.error("Сначала рассчитай отчёты.")
     else:
