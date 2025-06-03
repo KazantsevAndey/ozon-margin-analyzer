@@ -34,6 +34,7 @@ if upload_method == "Загрузить Excel":
     if uploaded_file is not None:
         try:
             price = pd.read_excel(uploaded_file)
+            st.session_state["price_from_template"] = price
             st.success("Файл успешно загружен.")
             st.dataframe(price)
         except Exception as e:
@@ -71,6 +72,8 @@ else:
 
 
 if st.button("📊 Рассчитать (этап 2)"):
+    if price is None:
+        price = st.session_state.get("price_from_template")
     if not api_key or not perf_key or not client_id or price is None:
         st.error("Пожалуйста, заполните все поля и загрузите прайс.")
     else:
